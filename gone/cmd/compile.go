@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -7,23 +7,7 @@ import (
 	"path/filepath"
 )
 
-func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("Usage: gone <command>")
-	}
-
-	command := os.Args[1]
-
-	switch command {
-	case "compile":
-		runCompileCommand()
-	// Add cases for other commands if needed.
-	default:
-		log.Fatalf("Unknown command: %s", command)
-	}
-}
-
-func runCompileCommand() {
+func Compile() {
 	// Ensure the build directory exists.
 	buildDir := "build"
 	if _, err := os.Stat(buildDir); os.IsNotExist(err) {
