@@ -4,6 +4,8 @@ package main
 import (
 	"log"
 	"os"
+
+	"github.com/williamhcarter/gonelang/gone/cmd"
 )
 
 func main() {
@@ -15,8 +17,10 @@ func main() {
 
 	switch command {
 	case "compile":
-		gone.Compile()
-	// Add cases for other commands if needed.
+		cmd.Compile()
+	case "generate":
+		cmd.Generate()
+
 	default:
 		log.Fatalf("Unknown command: %s", command)
 	}

@@ -1,0 +1,6 @@
+// hello.gone
+package main
+
+function main() {
+	println("Hello, World!")
+}
