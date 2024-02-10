@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -55,9 +56,59 @@ func processFile(file string) error {
 		return err
 	}
 
-	// Add 'println("testing")' to the end of the file
-	content = append(content, []byte("\nprintln(\"testing\")\n")...)
+	processedContent, err := functionNamingPass(string(content))
+	if err != nil {
+		return fmt.Errorf("error in functionNamingPass: %v", err)
+	}
 
 	goFilePath := filepath.Join(buildFolder, strings.TrimSuffix(filepath.Base(file), ".gone")+".go")
-	return os.WriteFile(goFilePath, content, 0644)
+	return os.WriteFile(goFilePath, []byte(processedContent), 0644)
+}
+
+func functionNamingPass(content string) (string, error) {
+	var processedContent string
+
+	index := 0
+	for index < len(content) {
+		char, newIndex := getNextChar(content, index)
+		index = newIndex
+
+		// Check for the word 'function' and replace it with 'func'
+		if len(content)-index >= 8 && content[index:index+8] == "function" {
+			processedContent += "func"
+			index += 8
+		} else {
+			processedContent += string(char)
+		}
+	}
+
+	return processedContent, nil
+}
+
+func keywordFinder(content string, index int, keyword string) int {
+	for index < len(content) && !strings.HasPrefix(content[index:], keyword) {
+		index++
+	}
+	return index + 1
+}
+
+func getNextChar(content string, index int) (byte, int) {
+	fmt.Printf("getNextChar: Processing character '%c' at index %d\n", content[index], index)
+
+	switch char := content[index]; char {
+	case '\'':
+		return content[index], keywordFinder(content, index, "'")
+	case '"':
+		return content[index], keywordFinder(content, index, "\"")
+	case '/':
+		if index < len(content)-1 {
+			if content[index+1] == '/' {
+				return '\n', keywordFinder(content, index, "\n")
+			} else if content[index+1] == '*' {
+				return content[index], keywordFinder(content, index, "*/") + 2
+			}
+		}
+	}
+
+	return content[index], index + 1
 }
