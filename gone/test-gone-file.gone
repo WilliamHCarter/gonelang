@@ -2,5 +2,5 @@
 package main
 
 function main() {
-	println("Hello, World!")
+	println("Hello, World!");
 }

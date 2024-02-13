@@ -61,6 +61,11 @@ func processFile(file string) error {
 		return fmt.Errorf("error in functionNamingPass: %v", err)
 	}
 
+	processedContent, err = semicolonRemovalPass(string(processedContent))
+	if err != nil {
+		return fmt.Errorf("error in semicolonRemovalPass: %v", err)
+	}
+
 	goFilePath := filepath.Join(buildFolder, strings.TrimSuffix(filepath.Base(file), ".gone")+".go")
 	return os.WriteFile(goFilePath, []byte(processedContent), 0644)
 }
@@ -85,6 +90,20 @@ func functionNamingPass(content string) (string, error) {
 	return processedContent, nil
 }
 
+func semicolonRemovalPass(content string) (string, error) {
+	var processedContent string
+
+	index := 0
+	for index < len(content) {
+		char, newIndex := getNextChar(content, index)
+		index = newIndex
+		if char != ';' {
+			processedContent += string(char)
+		}
+	}
+
+	return processedContent, nil
+}
 func keywordFinder(content string, index int, keyword string) int {
 	for index < len(content) && !strings.HasPrefix(content[index:], keyword) {
 		index++
