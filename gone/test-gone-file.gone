@@ -1,6 +1,24 @@
 // hello.gone
 package main
 
+//import "fmt"
+
+
+//Test function returns
+function getGreeting() -> string {
+    return "Hello";
+}
+
+
+//Test multi-type returns
+function twoWords(firstWord string) -> string, string {
+    return firstWord, " World!";
+}
+
+
 function main() {
-	println("Hello, World!");
+// Call the new function
+exclaimedGreeting := getGreeting();
+println(exclaimedGreeting);
+
 }

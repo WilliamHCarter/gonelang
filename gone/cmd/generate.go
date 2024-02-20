@@ -66,6 +66,11 @@ func processFile(file string) error {
 		return fmt.Errorf("error in semicolonRemovalPass: %v", err)
 	}
 
+	processedContent, err = returnTypePass(string(processedContent))
+	if err != nil {
+		return fmt.Errorf("error in returnTypePass: %v", err)
+	}
+
 	goFilePath := filepath.Join(buildFolder, strings.TrimSuffix(filepath.Base(file), ".gone")+".go")
 	return os.WriteFile(goFilePath, []byte(processedContent), 0644)
 }
@@ -78,7 +83,6 @@ func functionNamingPass(content string) (string, error) {
 		char, newIndex := getNextChar(content, index)
 		index = newIndex
 
-		// Check for the word 'function' and replace it with 'func'
 		if len(content)-index >= 8 && content[index:index+8] == "function" {
 			processedContent += "func"
 			index += 8
@@ -104,6 +108,22 @@ func semicolonRemovalPass(content string) (string, error) {
 
 	return processedContent, nil
 }
+
+func returnTypePass(content string) (string, error) {
+	parts := strings.Split(content, "->")
+
+	for i := 0; i < len(parts)-1; i++ {
+		parts[i] = strings.TrimSpace(parts[i])
+		if !strings.HasPrefix(parts[i], "(") && !strings.HasSuffix(parts[i], ")") {
+			parts[i] = "(" + parts[i] + ")"
+		}
+	}
+
+	result := strings.Join(parts, "")
+
+	return result, nil
+}
+
 func keywordFinder(content string, index int, keyword string) int {
 	for index < len(content) && !strings.HasPrefix(content[index:], keyword) {
 		index++
