@@ -3,6 +3,10 @@ package main
 
 //import "fmt"
 
+//Test multi-type returns
+function twoWords(firstWord string) -> string, string {
+    return firstWord, " World!";
+}
 
 //Test function returns
 function getGreeting() -> string {
@@ -10,10 +14,6 @@ function getGreeting() -> string {
 }
 
 
-//Test multi-type returns
-function twoWords(firstWord string) -> string, string {
-    return firstWord, " World!";
-}
 
 
 function main() {
