@@ -101,7 +101,11 @@ func semicolonRemovalPass(content string) (string, error) {
 	for index < len(content) {
 		char, newIndex := getNextChar(content, index)
 		index = newIndex
-		if char != ';' {
+
+		if len(content)-index >= 8 && content[index:index+8] == "function" {
+			processedContent += "func"
+			index += 8
+		} else {
 			processedContent += string(char)
 		}
 	}
@@ -110,18 +114,43 @@ func semicolonRemovalPass(content string) (string, error) {
 }
 
 func returnTypePass(content string) (string, error) {
-	parts := strings.Split(content, "->")
+	var processedContent string
 
-	for i := 0; i < len(parts)-1; i++ {
-		parts[i] = strings.TrimSpace(parts[i])
-		if !strings.HasPrefix(parts[i], "(") && !strings.HasSuffix(parts[i], ")") {
-			parts[i] = "(" + parts[i] + ")"
+	index := 0
+	openBrace := false
+
+	for index < len(content) {
+		char, newIndex := getNextChar(content, index)
+		index = newIndex
+
+		if len(content)-index >= 2 && content[index:index+2] == "->" {
+			openBraceIndex := index + 2
+			for openBraceIndex < len(content) && content[openBraceIndex] != '{' {
+				openBraceIndex++
+			}
+			commaIndex := index + 2
+			for commaIndex < openBraceIndex && content[commaIndex] != ',' {
+				commaIndex++
+			}
+
+			if commaIndex < openBraceIndex {
+				processedContent += " ("
+				openBrace = true
+			} else {
+				processedContent += ""
+			}
+
+			index += 2
+		} else {
+			if openBrace && content[index-1] == '{' {
+				processedContent += ") "
+				openBrace = false
+			}
+			processedContent += string(char)
 		}
 	}
 
-	result := strings.Join(parts, "")
-
-	return result, nil
+	return processedContent, nil
 }
 
 func keywordFinder(content string, index int, keyword string) int {
@@ -132,7 +161,7 @@ func keywordFinder(content string, index int, keyword string) int {
 }
 
 func getNextChar(content string, index int) (byte, int) {
-	fmt.Printf("getNextChar: Processing character '%c' at index %d\n", content[index], index)
+	//fmt.Printf("getNextChar: Processing character '%c' at index %d\n", content[index], index)
 
 	switch char := content[index]; char {
 	case '\'':
