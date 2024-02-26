@@ -17,9 +17,9 @@ function getGreeting() -> string {
 
 
 function main() {
-// Call the new function
-let exclaimedGreeting = getGreeting();
-let noSpaces=exclaimedGreeting;
-println(noSpaces);
+    // Call the new function
+    let exclaimedGreeting = getGreeting();
+    let noSpaces=exclaimedGreeting;
+    println(noSpaces);
 
 }
