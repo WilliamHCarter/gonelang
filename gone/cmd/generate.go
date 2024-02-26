@@ -70,6 +70,11 @@ func processFile(file string) error {
 	if err != nil {
 		return fmt.Errorf("error in returnTypePass: %v", err)
 	}
+	print(string(processedContent))
+	processedContent, err = automaticTypePass(string(processedContent))
+	if err != nil {
+		return fmt.Errorf("error in automaticTypePass: %v", err)
+	}
 
 	goFilePath := filepath.Join(buildFolder, strings.TrimSuffix(filepath.Base(file), ".gone")+".go")
 	return os.WriteFile(goFilePath, []byte(processedContent), 0644)
@@ -101,11 +106,7 @@ func semicolonRemovalPass(content string) (string, error) {
 	for index < len(content) {
 		char, newIndex := getNextChar(content, index)
 		index = newIndex
-
-		if len(content)-index >= 8 && content[index:index+8] == "function" {
-			processedContent += "func"
-			index += 8
-		} else {
+		if char != ';' {
 			processedContent += string(char)
 		}
 	}
@@ -146,6 +147,27 @@ func returnTypePass(content string) (string, error) {
 				processedContent += ") "
 				openBrace = false
 			}
+			processedContent += string(char)
+		}
+	}
+
+	return processedContent, nil
+}
+
+func automaticTypePass(content string) (string, error) {
+	var processedContent string
+	index := 0
+	letFlag := false
+	for index < len(content) {
+		char, newIndex := getNextChar(content, index)
+		index = newIndex
+		if len(content)-index >= 3 && content[index:index+3] == "let" {
+			index += 3
+			letFlag = true
+		} else if len(content)-index >= 1 && content[index:index+1] == "=" && letFlag {
+			processedContent += string(char)
+			processedContent += ":"
+		} else {
 			processedContent += string(char)
 		}
 	}
