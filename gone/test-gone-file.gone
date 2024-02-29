@@ -10,7 +10,8 @@ function twoWords(firstWord string) -> string, string {
 
 //Test function returns
 function getGreeting() -> string {
-    return "Hello";
+    let firstWord: string = "Hello";
+    return firstWord;
 }
 
 

@@ -70,7 +70,6 @@ func processFile(file string) error {
 	if err != nil {
 		return fmt.Errorf("error in returnTypePass: %v", err)
 	}
-	print(string(processedContent))
 	processedContent, err = automaticTypePass(string(processedContent))
 	if err != nil {
 		return fmt.Errorf("error in automaticTypePass: %v", err)
@@ -158,20 +157,27 @@ func automaticTypePass(content string) (string, error) {
 	var processedContent string
 	index := 0
 	letFlag := false
+	letIndex := 0
 	for index < len(content) {
 		char, newIndex := getNextChar(content, index)
 		index = newIndex
 		if len(content)-index >= 3 && content[index:index+3] == "let" {
+			letIndex = index
 			index += 3
 			letFlag = true
-		} else if len(content)-index >= 1 && content[index:index+1] == "=" && letFlag {
+		} else if len(content)-index >= 1 && content[index] == ':' && letFlag {
+			processedContent += string(char)
+			processedContent = processedContent[:letIndex] + "var " + processedContent[letIndex:]
+			letFlag = false
+			index++
+		} else if len(content)-index >= 1 && content[index] == '=' && letFlag {
 			processedContent += string(char)
 			processedContent += ":"
+			letFlag = false
 		} else {
 			processedContent += string(char)
 		}
 	}
-
 	return processedContent, nil
 }
 
