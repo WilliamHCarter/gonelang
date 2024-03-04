@@ -14,7 +14,12 @@ function getGreeting() -> string {
     return firstWord;
 }
 
-
+//Test lambda functions
+function (firstWord: string, secondWord: string) -> string {
+    let concat = |x, y| x + y;
+    let result = concat(firstWord, secondWord);
+    return result;
+}
 
 
 function main() {
