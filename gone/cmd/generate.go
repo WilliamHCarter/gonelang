@@ -74,6 +74,10 @@ func processFile(file string) error {
 	if err != nil {
 		return fmt.Errorf("error in automaticTypePass: %v", err)
 	}
+	processedContent, err = lambdaFunctionPass(string(processedContent))
+	if err != nil {
+		return fmt.Errorf("error in lambdaFunctionPass: %v", err)
+	}
 
 	goFilePath := filepath.Join(buildFolder, strings.TrimSuffix(filepath.Base(file), ".gone")+".go")
 	return os.WriteFile(goFilePath, []byte(processedContent), 0644)
@@ -178,6 +182,42 @@ func automaticTypePass(content string) (string, error) {
 			processedContent += string(char)
 		}
 	}
+	return processedContent, nil
+}
+
+func lambdaFunctionPass(content string) (string, error) {
+	var processedContent string
+	index := 0
+
+	for index < len(content) {
+		char, newIndex := getNextChar(content, index)
+		index = newIndex
+
+		if char == '|' {
+			processedContent += "func("
+			lambdaArgs := ""
+
+			for index < len(content) && content[index] != '|' {
+				lambdaArgs += string(content[index])
+				index++
+			}
+			processedContent += lambdaArgs + ") "
+			index++
+
+			lambdaBody := ""
+			for index < len(content) && content[index] != '|' {
+				lambdaBody += string(content[index])
+				index++
+			}
+			processedContent += lambdaBody
+			if index < len(content) {
+				index++
+			}
+		} else {
+			processedContent += string(char)
+		}
+	}
+
 	return processedContent, nil
 }
 

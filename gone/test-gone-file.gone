@@ -4,7 +4,7 @@ package main
 //import "fmt"
 
 //Test multi-type returns
-function twoWords(firstWord string) -> string, string {
+function twoWords(firstWord: string) -> string, string {
     return firstWord, " World!";
 }
 
@@ -15,12 +15,11 @@ function getGreeting() -> string {
 }
 
 //Test lambda functions
-function (firstWord: string, secondWord: string) -> string {
-    let concat = |x, y| x + y;
+function lambdaTester(firstWord: string, secondWord: string) -> string {
+    let concat = |x: string, y: string|: string {return x + y};
     let result = concat(firstWord, secondWord);
     return result;
 }
-
 
 function main() {
     // Call the new function
