@@ -70,13 +70,20 @@ func processFile(file string) error {
 	if err != nil {
 		return fmt.Errorf("error in returnTypePass: %v", err)
 	}
+
 	processedContent, err = automaticTypePass(string(processedContent))
 	if err != nil {
 		return fmt.Errorf("error in automaticTypePass: %v", err)
 	}
+
 	processedContent, err = lambdaFunctionPass(string(processedContent))
 	if err != nil {
 		return fmt.Errorf("error in lambdaFunctionPass: %v", err)
+	}
+
+	processedContent, err = colonRemovalPass(string(processedContent))
+	if err != nil {
+		return fmt.Errorf("error in colonRemovalPass: %v", err)
 	}
 
 	goFilePath := filepath.Join(buildFolder, strings.TrimSuffix(filepath.Base(file), ".gone")+".go")
@@ -215,6 +222,25 @@ func lambdaFunctionPass(content string) (string, error) {
 			}
 		} else {
 			processedContent += string(char)
+		}
+	}
+
+	return processedContent, nil
+}
+
+func colonRemovalPass(content string) (string, error) {
+	var processedContent string
+
+	index := 0
+	for index < len(content) {
+		char, newIndex := getNextChar(content, index)
+		index = newIndex
+		if char != ':' {
+			processedContent += string(char)
+		}
+		if len(content)-index > 2 && content[index:index+2] == ":=" {
+			processedContent += ":="
+			index += 2
 		}
 	}
 
