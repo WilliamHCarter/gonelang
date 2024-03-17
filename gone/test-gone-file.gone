@@ -21,10 +21,20 @@ function lambdaTester(firstWord: string, secondWord: string) -> string {
     return result;
 }
 
+
+
+
+
 function main() {
     // Call the new function
     let exclaimedGreeting = getGreeting();
     let noSpaces=exclaimedGreeting;
-    println(noSpaces);
+    let resp = http.Get(endpoint)?
 
+    println(noSpaces);
 }
+
+//resp, err := http.Get(endpoint)
+//if err != nil {
+//    return nil, fmt.Errorf("error making request to Geo API: %w", err)
+//}

@@ -247,6 +247,22 @@ func colonRemovalPass(content string) (string, error) {
 	return processedContent, nil
 }
 
+func questionMarkPass(content string) (string, error) {
+	var processedContent string
+
+	index := 0
+	for index < len(content) {
+		char, newIndex := getNextChar(content, index)
+		index = newIndex
+		if char == '?' {
+			//TODO: Check if inline or declaration, then expand into if-else.
+			processedContent += string(char)
+		}
+		processedContent += string(char)
+	}
+	return processedContent, nil
+}
+
 func keywordFinder(content string, index int, keyword string) int {
 	for index < len(content) && !strings.HasPrefix(content[index:], keyword) {
 		index++
