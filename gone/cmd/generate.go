@@ -247,6 +247,24 @@ func colonRemovalPass(content string) (string, error) {
 	return processedContent, nil
 }
 
+func questionMarkHandler(phrase string) (string, error) {
+	parts := strings.SplitN(phrase, "=", 2)
+	if len(parts) != 2 {
+		return "", fmt.Errorf("invalid phrase: %s", phrase)
+	}
+
+	variable := strings.TrimSpace(parts[0])
+	functionCall := strings.TrimSpace(parts[1])
+
+	processedFunctionCall, err := questionMarkPass(functionCall)
+	if err != nil {
+		return "", err
+	}
+
+	result := fmt.Sprintf("%s = %s?", variable, processedFunctionCall)
+	return result, nil
+}
+
 func questionMarkPass(content string) (string, error) {
 	var processedContent string
 
@@ -255,8 +273,19 @@ func questionMarkPass(content string) (string, error) {
 		char, newIndex := getNextChar(content, index)
 		index = newIndex
 		if char == '?' {
-			//TODO: Check if inline or declaration, then expand into if-else.
-			processedContent += string(char)
+			phrase := ""
+			for i := index - 1; i >= 0; i-- {
+				if content[i] == ' ' {
+					break
+				}
+				phrase = string(content[i]) + phrase
+			}
+			processedPhrase, err := questionMarkHandler(phrase)
+			if err != nil {
+				return "", err
+			}
+
+			processedContent += processedPhrase
 		}
 		processedContent += string(char)
 	}
