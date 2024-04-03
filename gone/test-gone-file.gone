@@ -21,6 +21,13 @@ function lambdaTester(firstWord: string, secondWord: string) -> string {
     return result;
 }
 
+//Test question mark
+function questionMarkTester(codeWord: string) -> *string {
+    if (codeWord == "hello"){
+        return &codeWord
+    }
+    return nil;
+}
 
 
 
@@ -29,7 +36,7 @@ function main() {
     // Call the new function
     let exclaimedGreeting = getGreeting();
     let noSpaces=exclaimedGreeting;
-    let resp = http.Get(endpoint)?
+    let resp = questionMarkTester("hi")?;
 
     println(noSpaces);
 }

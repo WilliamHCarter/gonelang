@@ -14,10 +14,25 @@ func lambdaTester(firstWord string, secondWord string) string {
 	result := concat(firstWord, secondWord)
 	return result
 }
+
+func questionMarkTester(codeWord string) string {
+	if codeWord == "hello" {
+		return "codeWord"
+	}
+	return "nil"
+}
+
+func questionMark(value interface{}, err error) interface{} {
+	if err != nil {
+		panic(err)
+	}
+	return value
+}
 func main() {
 
 	exclaimedGreeting := getGreeting()
 	noSpaces := exclaimedGreeting
-	println(noSpaces)
+	a := questionMarkTester("hello")
 
+	println(noSpaces, a)
 }
