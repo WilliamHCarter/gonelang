@@ -37,7 +37,8 @@ function main() {
     let exclaimedGreeting = getGreeting();
     let noSpaces=exclaimedGreeting;
     let resp = questionMarkTester("hi")?;
-
+    
+    println(resp);
     println(noSpaces);
 }
 

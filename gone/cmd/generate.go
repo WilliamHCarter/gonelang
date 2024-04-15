@@ -91,6 +91,8 @@ func processFile(file string) error {
 		return fmt.Errorf("error in questionMarkPass: %v", err)
 	}
 
+	processedContent = insertQuestionMarkFunction(processedContent)
+
 	goFilePath := filepath.Join(buildFolder, strings.TrimSuffix(filepath.Base(file), ".gone")+".go")
 	return os.WriteFile(goFilePath, []byte(processedContent), 0644)
 }
@@ -254,9 +256,28 @@ func colonRemovalPass(content string) (string, error) {
 
 func questionMark(value interface{}, err error) interface{} {
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return value
+}
+
+func insertQuestionMarkFunction(content string) string {
+	funcStartIndex := strings.Index(content, "func")
+	questionMarkFuncDef := `
+func questionMark(value interface{}, err error) interface{} {
+	if err != nil {
+		return err
+	}
+	return value
+}
+	`
+	if funcStartIndex != -1 {
+		content = content[:funcStartIndex] + questionMarkFuncDef + content[funcStartIndex:]
+	} else {
+		content += questionMarkFuncDef
+	}
+
+	return content
 }
 
 func questionMarkPass(content string) (string, error) {
@@ -268,13 +289,14 @@ func questionMarkPass(content string) (string, error) {
 
 		if char == '?' {
 			phrase := ""
-			for i := index - 1; i >= 0; i-- {
-				if content[i] == ' ' || content[i] == '=' || content[i] == ':' {
+			i := index - 1
+			for ; i >= 0; i-- {
+				if content[i] == ' ' || content[i] == '=' || content[i] == ':' || content[i] == '(' || content[i] == ',' {
 					break
 				}
-				phrase = string(content[i]) + phrase
 			}
-			processedContent += fmt.Sprintf("questionMark(%s)", phrase)
+			phrase = content[i+1 : index-1]
+			processedContent = processedContent[:len(processedContent)-(index-i-2)] + fmt.Sprintf("questionMark(%s)", phrase)
 		} else {
 			processedContent += string(char)
 		}
